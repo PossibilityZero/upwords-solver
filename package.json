@@ -5,10 +5,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "jest -o",
-    "test-watch": "jest --watchAll",
-    "test-full": "jest --verbose --coverage",
-    "test-precommit": "jest --passWithNoTests --coverage",
+    "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest -o",
+    "test-watch": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --watchAll",
+    "test-full": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --verbose --coverage",
+    "test-precommit": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --passWithNoTests --coverage",
     "build": "tsc",
     "lint": "eslint . --ext .ts",
     "prettier-format": "prettier --config .prettierrc 'src/**/*' --write",
@@ -29,7 +29,8 @@
   },
   "homepage": "https://github.com/PossibilityZero/upwords-solver#readme",
   "dependencies": {
-    "upwords-toolkit": "file:../upwords-toolkit"
+    "@kamilmielnik/trie": "^3.0.0",
+    "upwords-toolkit": "^0.1.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.5.0",
