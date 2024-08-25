@@ -30,7 +30,7 @@
   "homepage": "https://github.com/PossibilityZero/upwords-solver#readme",
   "dependencies": {
     "@kamilmielnik/trie": "^3.0.0",
-    "upwords-toolkit": "^0.1.2"
+    "upwords-toolkit": "^0.1.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.5.0",

@@ -138,28 +138,6 @@ describe('AlgorithmSubroutines', () => {
     });
   });
 
-  describe('findAllFreeLeftParts', () => {
-    it('should return all possible left parts of a word', () => {
-      const testWordList = ['hello', 'ham', 'he', 'test'];
-      const testTrie = new Trie();
-      testWordList.forEach((word) => testTrie.add(word));
-
-      const leftPartLimit = 4;
-
-      const rack = new TileRack();
-      rack.addTiles({ H: 1, E: 1, L: 1 });
-
-      const foundLeftParts = AlgorithmSubroutines.findAllFreeLeftParts(
-        testTrie,
-        leftPartLimit,
-        rack
-      );
-      expect(foundLeftParts).toHaveLength(4);
-      // don't include 'hell' because the rack only has one 'L'
-      expect(foundLeftParts).toEqual(expect.arrayContaining(['', 'h', 'he', 'hel']));
-    });
-  });
-
   describe('findLeftParts', () => {
     test.each([
       { anchor: [3, 9], expected: ['WE'], direction: PlayDirection.Horizontal },
@@ -187,27 +165,38 @@ describe('AlgorithmSubroutines', () => {
       }
     );
 
-    it('should return all valid word prefixes that can be formed to the left of the anchor square', () => {
+    test.each([
+      {
+        subtest: 'more empty spaces than the longest valid word',
+        anchor: [2, 7],
+        direction: PlayDirection.Horizontal,
+        expected: ['', 'h', 'he', 'hel']
+      },
+      {
+        subtest: 'fewer empty spaces than the longest valid word',
+        anchor: [6, 6],
+        direction: PlayDirection.Horizontal,
+        expected: ['', 'h']
+      }
+    ])('should find valid prefixes: $subtest', ({ anchor, direction, expected }) => {
       const testWordList = ['hello', 'ham', 'he', 'test'];
       const testTrie = new Trie();
       testWordList.forEach((word) => testTrie.add(word));
       const board = UBFHelper.copyBoard(simpleUBF);
-      const anchor: Coord = [2, 7]; // has many free spaces in front horizontally
-      const direction = PlayDirection.Horizontal;
       const rack = new TileRack();
       rack.addTiles({ H: 1, E: 1, L: 1, Z: 4 });
 
       const foundLeftParts = AlgorithmSubroutines.findLeftParts(
         testTrie,
         board,
-        anchor,
+        anchor as Coord,
         direction,
         rack
       );
-      expect(foundLeftParts).toHaveLength(4);
+      expect(foundLeftParts).toHaveLength(expected.length);
       // don't include 'hell' because the rack only has one 'L'
       // include the empty prefix ''
-      expect(foundLeftParts).toEqual(expect.arrayContaining(['', 'h', 'he', 'hel']));
+      expect(foundLeftParts).toEqual(expect.arrayContaining(expected));
     });
 
     it('should return an array with an empty string if the anchor square is at the edge of the board', () => {
