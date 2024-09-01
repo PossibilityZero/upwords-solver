@@ -1,6 +1,7 @@
 import { PlayDirection, UBFHelper, TileRack, Coord } from 'upwords-toolkit';
 import { UpwordsWordFinderAlgorithmSubroutines as AlgorithmSubroutines } from './algorithmSubroutines';
 import { Trie } from '@kamilmielnik/trie';
+import { UpwordsCrossCheckManager } from './crossCheckManager';
 
 describe('AlgorithmSubroutines', () => {
   const simpleUBF = [
@@ -216,6 +217,93 @@ describe('AlgorithmSubroutines', () => {
 
       expect(leftParts).toHaveLength(1);
       expect(leftParts).toEqual(expect.arrayContaining(['']));
+    });
+  });
+
+  describe('extendRight', () => {
+    it('should return a list of words that can be formed by extending the left part', () => {
+      const testWordList = ['life', 'live', 'lived', 'liver', 'love'];
+      const testTrie = new Trie();
+      testWordList.forEach((word) => testTrie.add(word));
+      const node = testTrie.find('l');
+      const testRack = new TileRack();
+      const board = UBFHelper.copyBoard(simpleUBF);
+      const leftPart = 'l';
+      const anchor: Coord = [5, 5];
+      const direction = PlayDirection.Vertical;
+      testRack.addTiles({ I: 1, E: 1, V: 1, F: 1, R: 1, Z: 2 });
+      const crossCheckManager = new UpwordsCrossCheckManager(testTrie);
+      crossCheckManager.board = board;
+
+      const foundWords = AlgorithmSubroutines.extendRight(
+        node!,
+        crossCheckManager,
+        testRack,
+        board,
+        direction,
+        anchor,
+        leftPart
+      );
+
+      expect(foundWords).toHaveLength(3);
+      expect(foundWords).toEqual(expect.arrayContaining(['life', 'live', 'liver']));
+    });
+
+    it('should not return words that fall off the edge of the board', () => {
+      const testWordList = ['sea', 'wag', 'wage', 'wad', 'wade', 'we', 'see'];
+      const testTrie = new Trie();
+      testWordList.forEach((word) => testTrie.add(word));
+      const node = testTrie.find('w');
+      const testRack = new TileRack();
+      const board = UBFHelper.copyBoard(simpleUBF);
+      const leftPart = 'w';
+      const anchor: Coord = [3, 8];
+      const direction = PlayDirection.Horizontal;
+      testRack.addTiles({ A: 1, G: 1, E: 1, D: 1, Z: 3 });
+      const crossCheckManager = new UpwordsCrossCheckManager(testTrie);
+      crossCheckManager.board = board;
+
+      const foundWords = AlgorithmSubroutines.extendRight(
+        node!,
+        crossCheckManager,
+        testRack,
+        board,
+        direction,
+        anchor,
+        leftPart
+      );
+
+      expect(foundWords).toEqual(expect.arrayContaining(['wag', 'wad']));
+      expect(foundWords).not.toEqual(expect.arrayContaining(['wage']));
+      expect(foundWords).not.toEqual(expect.arrayContaining(['wade']));
+    });
+
+    it('should use letters on the board to form words', () => {
+      const testWordList = ['should'];
+      const testTrie = new Trie();
+      testWordList.forEach((word) => testTrie.add(word));
+      const node = testTrie.find('s');
+      const testRack = new TileRack();
+      const board = UBFHelper.copyBoard(simpleUBF);
+      const leftPart = 's';
+      const anchor: Coord = [6, 4];
+      const direction = PlayDirection.Horizontal;
+      testRack.addTiles({ H: 1, O: 1, U: 1, D: 1, Z: 3 });
+      const crossCheckManager = new UpwordsCrossCheckManager(testTrie);
+      crossCheckManager.board = board;
+
+      const foundWords = AlgorithmSubroutines.extendRight(
+        node!,
+        crossCheckManager,
+        testRack,
+        board,
+        direction,
+        anchor,
+        leftPart
+      );
+
+      expect(foundWords).toHaveLength(1);
+      expect(foundWords).toEqual(expect.arrayContaining(['should']));
     });
   });
 });

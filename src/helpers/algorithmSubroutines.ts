@@ -1,7 +1,12 @@
 import { Trie } from '@kamilmielnik/trie';
+import { find, Node } from '@kamilmielnik/trie';
 import { PlayDirection, TileRack, Letter } from 'upwords-toolkit';
 import { UBFHelper as UBF } from 'upwords-toolkit';
 import { IUpwordsBoardFormat, Coord } from 'upwords-toolkit';
+
+interface ICrossChecker {
+  getCrossCheck(square: Coord, direction: PlayDirection): string[];
+}
 
 class UpwordsWordFinderAlgorithmSubroutines {
   static findAnchorSquares(board: IUpwordsBoardFormat): Coord[] {
@@ -21,8 +26,8 @@ class UpwordsWordFinderAlgorithmSubroutines {
       for (let x = 0; x < board.length; x++) {
         for (let y = 0; y < board[x]!.length; y++) {
           const height = UBF.getHeightAt(board, [x, y]);
-          const adjacentTiles = UBF.getAdjacentTiles(board, [x, y]);
-          if (height < 5 && adjacentTiles.some((tile) => tile.height > 0)) {
+          const adjacentCells = UBF.getAdjacentCells(board, [x, y]);
+          if (height < 5 && adjacentCells.some((tile) => tile.height > 0)) {
             anchors.push([x, y]);
           }
         }
@@ -85,6 +90,10 @@ class UpwordsWordFinderAlgorithmSubroutines {
     direction: PlayDirection,
     rack: TileRack
   ): string[] {
+    function isFrontEdgeOfBoard(coord: Coord, direction: PlayDirection): boolean {
+      return direction === PlayDirection.Vertical ? coord[0] === 0 : coord[1] === 0;
+    }
+
     const limit = this.findLeftpartLimit(board, anchor, direction);
     if (limit === 0) {
       if (isFrontEdgeOfBoard(anchor, direction)) {
@@ -109,10 +118,58 @@ class UpwordsWordFinderAlgorithmSubroutines {
       return [...freeLeftParts];
     }
   }
+
+  static extendRight(
+    trieNode: Node,
+    crossChecker: ICrossChecker,
+    rack: TileRack,
+    board: IUpwordsBoardFormat,
+    direction: PlayDirection,
+    currentCoord: Coord,
+    partialWord: string
+  ): string[] {
+    const words: string[] = [];
+
+    const crossChecks = crossChecker.getCrossCheck(
+      currentCoord,
+      UBF.getOrthogonalDirection(direction)
+    );
+    const availableLetters = rack
+      .listLetters()
+      .filter((letter) => crossChecks.includes(letter))
+      .map((letter) => letter.toLowerCase());
+    const isPossibleWordEnd =
+      coordIsOffBoard(currentCoord) || UBF.getHeightAt(board, currentCoord) === 0;
+    if (isPossibleWordEnd && trieNode.wordEnd) {
+      words.push(partialWord);
+    } else {
+      availableLetters.push(UBF.getLetterAt(board, currentCoord).toLowerCase());
+    }
+    for (const letter of availableLetters) {
+      const nextNode = find(trieNode, letter);
+      if (nextNode) {
+        rack.removeTile(letter.toUpperCase() as Letter, 1);
+        const newCoord = UBF.offsetCoord(currentCoord, direction, 1);
+        words.push(
+          ...this.extendRight(
+            nextNode,
+            crossChecker,
+            rack,
+            board,
+            direction,
+            newCoord,
+            partialWord + letter
+          )
+        );
+        rack.addTile(letter.toUpperCase() as Letter, 1);
+      }
+    }
+    return words;
+  }
 }
 
-function isFrontEdgeOfBoard(coord: Coord, direction: PlayDirection): boolean {
-  return direction === PlayDirection.Vertical ? coord[0] === 0 : coord[1] === 0;
+function coordIsOffBoard(coord: Coord): boolean {
+  return coord.some((val) => val < 0 || val > 9);
 }
 
 export { UpwordsWordFinderAlgorithmSubroutines };
