@@ -1,12 +1,11 @@
-import { Trie } from '@kamilmielnik/trie';
-import { find, Node } from '@kamilmielnik/trie';
+import { Trie, Node, find } from '@kamilmielnik/trie';
 import { PlayDirection, TileRack, Letter } from 'upwords-toolkit';
 import { UBFHelper as UBF } from 'upwords-toolkit';
 import { IUpwordsBoardFormat, Coord } from 'upwords-toolkit';
 
-interface ICrossChecker {
+type CrossChecker = {
   getCrossCheck(square: Coord, direction: PlayDirection): string[];
-}
+};
 
 class UpwordsWordFinderAlgorithmSubroutines {
   static findAnchorSquares(board: IUpwordsBoardFormat): Coord[] {
@@ -107,11 +106,11 @@ class UpwordsWordFinderAlgorithmSubroutines {
         return [
           word
             .slice(0, anchorIndex)
-            .map((tile) => tile.letter)
+            .map((tile) => tile.letter.toLowerCase())
             .join('')
         ];
       } else {
-        return [word.map((tile) => tile.letter).join('')];
+        return [word.map((tile) => tile.letter.toLowerCase()).join('')];
       }
     } else {
       const freeLeftParts = this.#findAllFreeLeftParts(trie, limit, rack);
@@ -121,12 +120,13 @@ class UpwordsWordFinderAlgorithmSubroutines {
 
   static extendRight(
     trieNode: Node,
-    crossChecker: ICrossChecker,
+    crossChecker: CrossChecker,
     rack: TileRack,
     board: IUpwordsBoardFormat,
     direction: PlayDirection,
     currentCoord: Coord,
-    partialWord: string
+    partialWord: string,
+    isFirstCall = true
   ): string[] {
     const words: string[] = [];
 
@@ -140,15 +140,32 @@ class UpwordsWordFinderAlgorithmSubroutines {
       .map((letter) => letter.toLowerCase());
     const isPossibleWordEnd =
       coordIsOffBoard(currentCoord) || UBF.getHeightAt(board, currentCoord) === 0;
+    const currentTileLetter = coordIsOffBoard(currentCoord)
+      ? ''
+      : UBF.getLetterAt(board, currentCoord).toLowerCase();
     if (isPossibleWordEnd && trieNode.wordEnd) {
-      words.push(partialWord);
+      if (!isFirstCall) {
+        // don't add 0-length right parts
+        words.push(partialWord);
+      }
     } else {
-      availableLetters.push(UBF.getLetterAt(board, currentCoord).toLowerCase());
+      if (!availableLetters.includes(currentTileLetter)) {
+        availableLetters.push(currentTileLetter);
+      }
+    }
+
+    if (coordIsOffBoard(currentCoord)) {
+      return words;
     }
     for (const letter of availableLetters) {
       const nextNode = find(trieNode, letter);
       if (nextNode) {
-        rack.removeTile(letter.toUpperCase() as Letter, 1);
+        if (currentTileLetter !== letter) {
+          rack.removeTile(letter.toUpperCase() as Letter, 1);
+        } else if (isFirstCall) {
+          // anchor square must be changed; unchanged means that the letter is already on the board
+          continue;
+        }
         const newCoord = UBF.offsetCoord(currentCoord, direction, 1);
         words.push(
           ...this.extendRight(
@@ -158,10 +175,13 @@ class UpwordsWordFinderAlgorithmSubroutines {
             board,
             direction,
             newCoord,
-            partialWord + letter
+            partialWord + letter,
+            false
           )
         );
-        rack.addTile(letter.toUpperCase() as Letter, 1);
+        if (currentTileLetter !== letter) {
+          rack.addTile(letter.toUpperCase() as Letter, 1);
+        }
       }
     }
     return words;

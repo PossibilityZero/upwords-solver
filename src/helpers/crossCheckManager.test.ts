@@ -1,10 +1,10 @@
 import { jest } from '@jest/globals';
 
-import { UBFHelper, PlayDirection, IUpwordsPlay } from 'upwords-toolkit';
+import { UBFHelper, PlayDirection, UpwordsPlay } from 'upwords-toolkit';
 import { UpwordsCrossCheckManager } from './crossCheckManager';
 import { Trie } from '@kamilmielnik/trie';
 
-function makePlay(tiles: string, start: [number, number], direction: PlayDirection): IUpwordsPlay {
+function makePlay(tiles: string, start: [number, number], direction: PlayDirection): UpwordsPlay {
   return {
     tiles,
     start,
@@ -78,6 +78,9 @@ describe('UpwordsCrossCheckManager', () => {
       const validLetters2 = crossCheck.getCrossCheck([3, 4], PlayDirection.Vertical);
       expect(validLetters2).toHaveLength(2);
       expect(validLetters2).toEqual(expect.arrayContaining(['M', 'H']));
+
+      const validLetters3 = crossCheck.getCrossCheck([6, 8], PlayDirection.Horizontal);
+      expect(validLetters3).toHaveLength(0);
     });
 
     it('should return an empty array for a square with height 5', () => {

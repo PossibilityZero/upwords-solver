@@ -1,11 +1,5 @@
 import { Trie } from '@kamilmielnik/trie';
-import {
-  IUpwordsBoardFormat,
-  Coord,
-  UBFHelper,
-  IUpwordsPlay,
-  PlayDirection
-} from 'upwords-toolkit';
+import { IUpwordsBoardFormat, Coord, UBFHelper, UpwordsPlay, PlayDirection } from 'upwords-toolkit';
 
 const ENGLISH_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
@@ -35,7 +29,7 @@ class UpwordsCrossCheckManager {
     this.#computeCrossChecks();
   }
 
-  addMove(play: IUpwordsPlay): void {
+  addMove(play: UpwordsPlay): void {
     this.boardState = UBFHelper.placeTiles(this.boardState, play);
     this.#computeCrossChecks();
   }
