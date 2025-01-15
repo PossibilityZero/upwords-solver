@@ -56,6 +56,31 @@ describe('UpwordsWordFinder', () => {
       expect(plays.some((play) => numArraysEqual(play.start, start))).toBe(true);
     }
   });
+
+  it('should only return the tiles that are used from the rack', () => {
+    const wordList = ['test'];
+    UpwordsWordFinder.init(wordList);
+    const blankUBF = [
+      ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+      ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+      ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+      ['0 ', '0 ', '0 ', '0 ', '1T', '0 ', '0 ', '0 ', '0 ', '0 '],
+      ['0 ', '0 ', '0 ', '0 ', '1E', '0 ', '0 ', '0 ', '0 ', '0 '],
+      ['0 ', '0 ', '0 ', '0 ', '1S', '0 ', '0 ', '0 ', '0 ', '0 '],
+      ['0 ', '0 ', '0 ', '0 ', '1T', '0 ', '0 ', '0 ', '0 ', '0 '],
+      ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+      ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
+      ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ']
+    ];
+    const tiles = new TileRack();
+    tiles.addTiles({ T: 1, E: 1, S: 1, Z: 4 });
+
+    const plays = UpwordsWordFinder.findAllPossiblePlays(blankUBF, tiles);
+    const testPlay1 = plays.filter((play) => numArraysEqual(play.start, [3, 1]))[0];
+    expect(testPlay1!.tiles).toBe('TES ');
+    const testPlay2 = plays.filter((play) => numArraysEqual(play.start, [6, 4]))[0];
+    expect(testPlay2!.tiles).toBe(' EST');
+  });
 });
 
 function numArraysEqual(a: number[], b: number[]): boolean {

@@ -8,8 +8,8 @@ import {
   Coord
 } from 'upwords-toolkit';
 import { Trie } from '@kamilmielnik/trie';
-import { UpwordsWordFinderAlgorithmSubroutines as Subroutines } from './helpers/algorithmSubroutines';
-import { UpwordsCrossCheckManager } from './helpers/crossCheckManager';
+import { UpwordsWordFinderAlgorithmSubroutines as Subroutines } from './helpers/algorithmSubroutines.js';
+import { UpwordsCrossCheckManager } from './helpers/crossCheckManager.js';
 
 const ACROSS = PlayDirection.Horizontal;
 const DOWN = PlayDirection.Vertical;
@@ -38,7 +38,7 @@ class UpwordsWordFinder {
         });
       }
     }
-    return words;
+    return words.map((word) => useOnlyRackTiles(word, board));
   }
 
   static #findMatchingRightParts(
@@ -92,4 +92,18 @@ function addBackWithheldTiles(rack: TileRack, withheldTiles: TileRack | null): T
     rack.addTile(letter as Letter, 1);
   }
   return rack;
+}
+
+function useOnlyRackTiles(play: UpwordsPlay, board: IUpwordsBoardFormat): UpwordsPlay {
+  const tiles = play.tiles.split('');
+  let newTiles = '';
+  for (let i = 0; i < tiles.length; i++) {
+    const coord = UBFHelper.offsetCoord(play.start, play.direction, i);
+    if (UBFHelper.getLetterAt(board, coord) !== play.tiles[i]) {
+      newTiles += tiles[i];
+    } else {
+      newTiles += ' ';
+    }
+  }
+  return { ...play, tiles: newTiles };
 }

@@ -1,3 +1,3 @@
-import { UBFHelper } from 'upwords-toolkit';
+import { UpwordsWordFinder } from './wordFinder.js';
 
-console.log(`Imported ${UBFHelper}`);
+export { UpwordsWordFinder };
