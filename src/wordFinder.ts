@@ -19,7 +19,7 @@ class UpwordsWordFinder {
   static init(wordList: string[]): void {
     this.wordTrie = new Trie();
     wordList.forEach((word) => {
-      this.wordTrie.add(word);
+      this.wordTrie.add(word.toUpperCase());
     });
   }
 

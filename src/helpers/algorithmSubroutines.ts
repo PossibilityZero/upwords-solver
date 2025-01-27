@@ -65,7 +65,7 @@ class UpwordsWordFinderAlgorithmSubroutines {
       } else {
         const availableLetters: Letter[] = rack.listLetters();
         for (const letter of availableLetters) {
-          const newPrefix = prefix + letter.toLowerCase();
+          const newPrefix = prefix + letter.toUpperCase();
           if (trie.hasPrefix(newPrefix)) {
             foundPrefixes.push(newPrefix);
 
@@ -106,11 +106,11 @@ class UpwordsWordFinderAlgorithmSubroutines {
         return [
           word
             .slice(0, anchorIndex)
-            .map((tile) => tile.letter.toLowerCase())
+            .map((tile) => tile.letter.toUpperCase())
             .join('')
         ];
       } else {
-        return [word.map((tile) => tile.letter.toLowerCase()).join('')];
+        return [word.map((tile) => tile.letter.toUpperCase()).join('')];
       }
     } else {
       const freeLeftParts = this.#findAllFreeLeftParts(trie, limit, rack);
@@ -137,12 +137,12 @@ class UpwordsWordFinderAlgorithmSubroutines {
     const availableLetters = rack
       .listLetters()
       .filter((letter) => crossChecks.includes(letter))
-      .map((letter) => letter.toLowerCase());
+      .map((letter) => letter.toUpperCase());
     const isPossibleWordEnd =
       coordIsOffBoard(currentCoord) || UBF.getHeightAt(board, currentCoord) === 0;
     const currentTileLetter = coordIsOffBoard(currentCoord)
       ? ''
-      : UBF.getLetterAt(board, currentCoord).toLowerCase();
+      : UBF.getLetterAt(board, currentCoord).toUpperCase();
     if (isPossibleWordEnd && trieNode.wordEnd) {
       if (!isFirstCall) {
         // don't add 0-length right parts

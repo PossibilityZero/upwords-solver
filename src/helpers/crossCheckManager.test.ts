@@ -23,7 +23,7 @@ describe('UpwordsCrossCheckManager', () => {
   });
   const testTrie = new Trie();
 
-  const testWordList = ['hello', 'cello', 'world', 'he', 'hi', 'me'];
+  const testWordList = ['HELLO', 'CELLO', 'WORLD', 'HE', 'HI', 'ME'];
   const simpleUBF = [
     ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],
     ['0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 ', '0 '],

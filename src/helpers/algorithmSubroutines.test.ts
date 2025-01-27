@@ -141,11 +141,11 @@ describe('AlgorithmSubroutines', () => {
 
   describe('findLeftParts', () => {
     test.each([
-      { anchor: [3, 9], expected: ['we'], direction: PlayDirection.Horizontal },
-      { anchor: [2, 9], expected: ['e'], direction: PlayDirection.Horizontal },
-      { anchor: [5, 4], expected: ['a'], direction: PlayDirection.Horizontal },
-      { anchor: [5, 4], expected: ['e'], direction: PlayDirection.Vertical },
-      { anchor: [6, 3], expected: ['ha'], direction: PlayDirection.Vertical }
+      { anchor: [3, 9], expected: ['WE'], direction: PlayDirection.Horizontal },
+      { anchor: [2, 9], expected: ['E'], direction: PlayDirection.Horizontal },
+      { anchor: [5, 4], expected: ['A'], direction: PlayDirection.Horizontal },
+      { anchor: [5, 4], expected: ['E'], direction: PlayDirection.Vertical },
+      { anchor: [6, 3], expected: ['HA'], direction: PlayDirection.Vertical }
     ])(
       'should return what is currently on the board if it immediately precedes the anchor square: $anchor -> $expected',
       ({ anchor, expected, direction }) => {
@@ -171,16 +171,16 @@ describe('AlgorithmSubroutines', () => {
         subtest: 'more empty spaces than the longest valid word',
         anchor: [2, 7],
         direction: PlayDirection.Horizontal,
-        expected: ['', 'h', 'he', 'hel']
+        expected: ['', 'H', 'HE', 'HEL']
       },
       {
         subtest: 'fewer empty spaces than the longest valid word',
         anchor: [6, 6],
         direction: PlayDirection.Horizontal,
-        expected: ['', 'h']
+        expected: ['', 'H']
       }
     ])('should find valid prefixes: $subtest', ({ anchor, direction, expected }) => {
-      const testWordList = ['hello', 'ham', 'he', 'test'];
+      const testWordList = ['HELLO', 'HAM', 'HE', 'TEST'];
       const testTrie = new Trie();
       testWordList.forEach((word) => testTrie.add(word));
       const board = UBFHelper.copyBoard(simpleUBF);
@@ -222,13 +222,13 @@ describe('AlgorithmSubroutines', () => {
 
   describe('extendRight', () => {
     it('should return a list of words that can be formed by extending the left part', () => {
-      const testWordList = ['life', 'live', 'lived', 'liver', 'love'];
+      const testWordList = ['LIFE', 'LIVE', 'LIVED', 'LIVER', 'LOVE'];
       const testTrie = new Trie();
       testWordList.forEach((word) => testTrie.add(word));
-      const node = testTrie.find('l');
+      const node = testTrie.find('L');
       const testRack = new TileRack();
       const board = UBFHelper.copyBoard(simpleUBF);
-      const leftPart = 'l';
+      const leftPart = 'L';
       const anchor: Coord = [5, 5];
       const direction = PlayDirection.Vertical;
       testRack.addTiles({ I: 1, E: 1, V: 1, F: 1, R: 1, Z: 2 });
@@ -246,17 +246,17 @@ describe('AlgorithmSubroutines', () => {
       );
 
       expect(foundWords).toHaveLength(3);
-      expect(foundWords).toEqual(expect.arrayContaining(['life', 'live', 'liver']));
+      expect(foundWords).toEqual(expect.arrayContaining(['LIFE', 'LIVE', 'LIVER']));
     });
 
     it('should not return words that fall off the edge of the board', () => {
-      const testWordList = ['sea', 'wag', 'wage', 'wad', 'wade', 'we', 'see'];
+      const testWordList = ['SEA', 'WAG', 'WAGE', 'WAD', 'WADE', 'WE', 'SEE'];
       const testTrie = new Trie();
       testWordList.forEach((word) => testTrie.add(word));
-      const node = testTrie.find('w');
+      const node = testTrie.find('W');
       const testRack = new TileRack();
       const board = UBFHelper.copyBoard(simpleUBF);
-      const leftPart = 'w';
+      const leftPart = 'W';
       const anchor: Coord = [3, 8];
       const direction = PlayDirection.Horizontal;
       testRack.addTiles({ A: 1, G: 1, E: 1, D: 1, Z: 3 });
@@ -274,19 +274,19 @@ describe('AlgorithmSubroutines', () => {
       );
 
       expect(foundWords).toHaveLength(2);
-      expect(foundWords).toEqual(expect.arrayContaining(['wag', 'wad']));
-      expect(foundWords).not.toEqual(expect.arrayContaining(['wage']));
-      expect(foundWords).not.toEqual(expect.arrayContaining(['wade']));
+      expect(foundWords).toEqual(expect.arrayContaining(['WAG', 'WAD']));
+      expect(foundWords).not.toEqual(expect.arrayContaining(['WAGE']));
+      expect(foundWords).not.toEqual(expect.arrayContaining(['WADE']));
     });
 
     it('should use letters on the board to form words', () => {
-      const testWordList = ['should'];
+      const testWordList = ['SHOULD'];
       const testTrie = new Trie();
       testWordList.forEach((word) => testTrie.add(word));
-      const node = testTrie.find('s');
+      const node = testTrie.find('S');
       const testRack = new TileRack();
       const board = UBFHelper.copyBoard(simpleUBF);
-      const leftPart = 's';
+      const leftPart = 'S';
       const anchor: Coord = [6, 4];
       const direction = PlayDirection.Horizontal;
       testRack.addTiles({ H: 1, O: 1, U: 1, D: 1, Z: 3 });
@@ -304,18 +304,18 @@ describe('AlgorithmSubroutines', () => {
       );
 
       expect(foundWords).toHaveLength(1);
-      expect(foundWords).toEqual(expect.arrayContaining(['should']));
+      expect(foundWords).toEqual(expect.arrayContaining(['SHOULD']));
     });
   });
 
   it('should only return words with at least 1 right part letter', () => {
-    const testWordList = ['life', 'live', 'lived', 'liver', 'love'];
+    const testWordList = ['LIFE', 'LIVE', 'LIVED', 'LIVER', 'LOVE'];
     const testTrie = new Trie();
     testWordList.forEach((word) => testTrie.add(word));
-    const node = testTrie.find('live');
+    const node = testTrie.find('LIVE');
     const testRack = new TileRack();
     const board = UBFHelper.copyBoard(simpleUBF);
-    const leftPart = 'live';
+    const leftPart = 'LIVE';
     const anchor: Coord = [5, 5];
     const direction = PlayDirection.Vertical;
     testRack.addTiles({ D: 1, E: 1, V: 1, F: 1, R: 1, Z: 2 });
@@ -333,17 +333,17 @@ describe('AlgorithmSubroutines', () => {
     );
 
     expect(foundWords).toHaveLength(2);
-    expect(foundWords).toEqual(expect.arrayContaining(['lived', 'liver']));
+    expect(foundWords).toEqual(expect.arrayContaining(['LIVED', 'LIVER']));
   });
 
   it('should not use tiles from the rack if the letter is already on the board', () => {
-    const testWordList = ['hash', 'hush', 'hashes'];
+    const testWordList = ['HASH', 'HUSH', 'HASHES'];
     const testTrie = new Trie();
     testWordList.forEach((word) => testTrie.add(word));
-    const node = testTrie.find('h');
+    const node = testTrie.find('H');
     const testRack = new TileRack();
     const board = UBFHelper.copyBoard(simpleUBF);
-    const leftPart = 'h';
+    const leftPart = 'H';
     const anchor: Coord = [5, 3];
     const direction = PlayDirection.Vertical;
     testRack.addTiles({ A: 1, S: 1, H: 1, U: 1, E: 1, Z: 3 });
@@ -361,6 +361,6 @@ describe('AlgorithmSubroutines', () => {
     );
 
     expect(foundWords).toHaveLength(1);
-    expect(foundWords).toEqual(expect.arrayContaining(['hush']));
+    expect(foundWords).toEqual(expect.arrayContaining(['HUSH']));
   });
 });

@@ -75,7 +75,7 @@ class UpwordsCrossCheckManager {
       if (letter === currentLetter) {
         continue;
       }
-      if (this.wordTrie.has(wildcardWord.replace('#', letter).toLowerCase())) {
+      if (this.wordTrie.has(wildcardWord.replace('#', letter).toUpperCase())) {
         allowedLetters.push(letter);
       }
     }
