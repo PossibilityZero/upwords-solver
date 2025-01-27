@@ -1,6 +1,6 @@
 {
   "name": "upwords-solver",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Collection of tools for solving Upwords board game positions",
   "main": "dist/index.js",
   "type": "module",
